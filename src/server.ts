@@ -1,8 +1,8 @@
 // server.ts
 import mongoose from 'mongoose'
 import app from './app'
-import dotenv from 'dotenv'
-dotenv.config()
+import { config } from 'dotenv'
+config()
 
 const PORT = process.env.RUNNING_PORT || 5000
 
