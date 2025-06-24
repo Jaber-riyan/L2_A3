@@ -1,4 +1,4 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { model, Schema } from "mongoose";
 import { IBorrow } from "../interfaces/borrow.interface";
 
 const borrowSchema = new Schema<IBorrow>(
@@ -27,3 +27,5 @@ const borrowSchema = new Schema<IBorrow>(
         timestamps: true
     }
 )
+
+export const Borrow = model("Borrow", borrowSchema)

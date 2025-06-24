@@ -33,7 +33,7 @@ booksRoutes.post('/', async (req: Request, res: Response) => {
     }
     catch (error: any) {
         res.status(500).json({
-            message: "Failed to retrieve books",
+            message: "Failed to created book",
             success: false,
             error: error.message || error,
         });
@@ -95,7 +95,7 @@ booksRoutes.get("/", async (req: Request, res: Response) => {
     }
     catch (error: any) {
         res.status(500).json({
-            message: "Failed to retrieve books",
+            message: "Failed to retrieve all books",
             success: false,
             error: error.message || error,
         });
@@ -117,7 +117,7 @@ booksRoutes.get("/:bookId", async (req: Request, res: Response) => {
     }
     catch (error: any) {
         res.status(500).json({
-            message: "Failed to retrieve books",
+            message: "Failed to retrieve book",
             success: false,
             error: error.message || error,
         });
@@ -173,7 +173,7 @@ booksRoutes.put("/:bookId", async (req: Request, res: Response) => {
     }
     catch (error: any) {
         res.status(500).json({
-            message: "Failed to retrieve books",
+            message: "Failed to updated book",
             success: false,
             error: error.message || error,
         });
@@ -185,7 +185,23 @@ booksRoutes.delete("/:bookId", async (req: Request, res: Response) => {
     try {
         const bookId = req.params.bookId
 
+        if (!Types.ObjectId.isValid(bookId)) {
+            res.status(400).json({
+                success: false,
+                message: 'Invalid book ID',
+            });
+            return
+        }
+
         const book = await Book.findByIdAndDelete(bookId)
+
+        if (!book) {
+            res.status(404).json({
+                success: false,
+                message: 'Book not found',
+            });
+            return
+        }
 
         res.json({
             success: true,
@@ -195,7 +211,7 @@ booksRoutes.delete("/:bookId", async (req: Request, res: Response) => {
     }
     catch (error: any) {
         res.status(500).json({
-            message: "Failed to retrieve books",
+            message: "Failed to delete book",
             success: false,
             error: error.message || error,
         });
