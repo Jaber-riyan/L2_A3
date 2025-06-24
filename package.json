@@ -8,8 +8,7 @@
     "start:prod":"/dist/server.js",
     "start": "npx tsx watch src/server.ts",
     "lint": "npx eslint .",
-    "lint:fix": "npx eslint . --fix",
-    "build": "tsc"
+    "lint:fix": "npx eslint . --fix"
   },
   "keywords": [],
   "author": "",

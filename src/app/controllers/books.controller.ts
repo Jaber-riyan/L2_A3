@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express'
 import { ZBooks } from '../zodSchema/books.zod'
 import { Book } from '../models/books.model'
+import { SortOrder } from 'mongoose'
 
 export const booksRoutes = express.Router()
 
@@ -25,15 +26,79 @@ booksRoutes.post('/', async (req: Request, res: Response) => {
         res.status(201).json({
             success: true,
             message: "Book created successfully",
-            data: { ...book }
+            data: book
         })
 
+    }
+    catch (error: any) {
+        res.status(500).json({
+            message: "Failed to retrieve books",
+            success: false,
+            error: error.message || error,
+        });
+    }
 
-    } catch (error: any) {
-        res.json({
-            status: false,
-            error: error.message
+})
+
+// Get all Books from Mongodb
+booksRoutes.get("/", async (req: Request, res: Response) => {
+    try {
+        const filter = (req.query.filter as string) || undefined;
+        const sortBy = (req.query.sortBy as string) || 'createdAt';
+        const sort = (req.query.sort as string) || 'asc';
+        const limit = parseInt(req.query.limit as string) || 10;
+
+        const allowedGenres = ['FICTION', 'NON_FICTION', 'SCIENCE', 'HISTORY', 'BIOGRAPHY', 'FANTASY'];
+        const allowedSortFields = ['createdAt', 'title', 'author', 'copies', 'available'];
+
+        if (filter && !allowedGenres.includes(filter as string)) {
+            res.status(400).json({
+                success: false,
+                message: `Invalid genre filter. Allowed genres: ${allowedGenres.join(', ')}`
+            });
+            return
+        }
+
+        if (!allowedSortFields.includes(sortBy as string)) {
+            res.status(400).json({
+                success: false,
+                message: `Invalid sortBy field. Allowed fields: ${allowedSortFields.join(', ')}`
+            });
+            return
+        }
+
+        const limitNumber = Number(limit);
+        if (isNaN(limitNumber) || limitNumber > 50) {
+            res.status(400).json({
+                success: false,
+                message: 'Limit must be a positive number not exceeding 50',
+            });
+            return
+        }
+
+        const query: any = {}
+        if (filter) {
+            query.genre = filter
+        }
+
+        const sortOrder: SortOrder = sort === 'desc' ? -1 : 1
+        const sortObj = { [sortBy as string]: sortOrder }
+
+        const books = await Book.find(query).sort(sortObj).limit(Number(limit))
+
+        res.status(200).json({
+            success: true,
+            message: "Books retrieved successfully",
+            data: books
+        })
+    }
+    catch (error: any) {
+        res.status(500).json({
+            message: "Failed to retrieve books",
+            success: false,
+            error: error.message || error,
         });
     }
 })
+
 
