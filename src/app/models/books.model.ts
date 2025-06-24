@@ -17,7 +17,7 @@ const bookSchema = new Schema<IBooks>({
             validator: function (value) {
                 return value > 0
             },
-            message: props => `${props.value} is not a positive number.please try with positive number`
+            message: props => `${props.value} is not a positive number. please try with positive number`
         }, required: true, min: 0
     },
     available: { type: Boolean, default: true }

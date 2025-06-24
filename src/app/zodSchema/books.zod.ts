@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const ZBooksModel = z.object({
+export const ZBooks = z.object({
     title:z.string().trim(),
     author:z.string().trim(),
     genre:z.string(),

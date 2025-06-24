@@ -1,7 +1,7 @@
 import express, { Application, Request, Response } from 'express'
-import { borrowRoutes } from './app/controllers/borrow.routes'
-import { booksRoutes } from './app/controllers/books.routes'
-const morgan = require('morgan')
+import { borrowRoutes } from './app/controllers/borrow.controller'
+import { booksRoutes } from './app/controllers/books.controller'
+import morgan from 'morgan'
 
 const app: Application = express()
 
@@ -17,7 +17,7 @@ app.use("/api/borrow",borrowRoutes)
 app.get('/', (req: Request, res: Response) => {
     res.json({
         status: true,
-        message: "Note App Server Working Finely 🎉"
+        message: "Server Working Finely 🎉"
     })
 })
 
