@@ -1,7 +1,8 @@
 import express, { Request, Response } from 'express'
 import { ZBooks } from '../zodSchema/books.zod'
 import { Book } from '../models/books.model'
-import { SortOrder } from 'mongoose'
+import { SortOrder, Types } from 'mongoose'
+import { ZBooksUpdate } from '../zodSchema/bookUpdate.zod'
 
 export const booksRoutes = express.Router()
 
@@ -101,4 +102,102 @@ booksRoutes.get("/", async (req: Request, res: Response) => {
     }
 })
 
+// Get a single Book From Mongodb
+booksRoutes.get("/:bookId", async (req: Request, res: Response) => {
+    try {
+        const bookId = req.params.bookId
 
+        const book = await Book.findById(bookId)
+
+        res.json({
+            success: true,
+            message: "Book retrieved successfully",
+            data: book
+        })
+    }
+    catch (error: any) {
+        res.status(500).json({
+            message: "Failed to retrieve books",
+            success: false,
+            error: error.message || error,
+        });
+    }
+})
+
+// Update a single Book from Mongodb
+booksRoutes.put("/:bookId", async (req: Request, res: Response) => {
+    try {
+        const { bookId } = req.params
+
+        if (!Types.ObjectId.isValid(bookId)) {
+            res.status(400).json({
+                success: false,
+                message: 'Invalid book ID',
+            });
+            return
+        }
+
+        const parsed = ZBooksUpdate.safeParse(req.body)
+        if (!parsed.success) {
+            res.status(400).json({
+                success: false,
+                message: 'Validation failed',
+                error: parsed.error.format(),
+            });
+            return
+        }
+
+        const updatedBook = await Book.findByIdAndUpdate(
+            bookId,
+            parsed.data,
+            {
+                new: true,
+                runValidators: true
+            }
+        )
+
+        if (!updatedBook) {
+            res.status(404).json({
+                success: false,
+                message: 'Book not found',
+            });
+            return
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Book updated successfully',
+            data: updatedBook,
+        })
+
+    }
+    catch (error: any) {
+        res.status(500).json({
+            message: "Failed to retrieve books",
+            success: false,
+            error: error.message || error,
+        });
+    }
+})
+
+// Delete a single Book from Mongodb
+booksRoutes.delete("/:bookId", async (req: Request, res: Response) => {
+    try {
+        const bookId = req.params.bookId
+
+        const book = await Book.findByIdAndDelete(bookId)
+
+        res.json({
+            success: true,
+            message: "Book deleted successfully",
+            data: book
+        })
+    }
+    catch (error: any) {
+        res.status(500).json({
+            message: "Failed to retrieve books",
+            success: false,
+            error: error.message || error,
+        });
+    }
+})

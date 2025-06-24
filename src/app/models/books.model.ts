@@ -1,25 +1,25 @@
-import { model, Schema } from 'mongoose'
-import { IBooks } from '../interfaces/books.interface'
+import { model, Schema } from 'mongoose';
+import { IBooks } from '../interfaces/books.interface';
 
 const bookSchema = new Schema<IBooks>(
     {
         title: { type: String, required: true, trim: true },
         author: { type: String, required: true, trim: true },
         genre: {
-            type: String, enum: {
+            type: String,
+            enum: {
                 values: ["FICTION", "NON_FICTION", "SCIENCE", "HISTORY", "BIOGRAPHY", "FANTASY"],
                 message: "Genre is not valid, got {VALUE}"
-            }, uppercase: true, trim: true
+            },
+            uppercase: true,
+            trim: true
         },
-        isbn: { type: String, unique: [true, "this isbn already used, try with another one"], required: true },
+        isbn: { type: String, required: true, unique: true, trim: true },
         description: { type: String },
         copies: {
-            type: Number, validate: {
-                validator: function (value) {
-                    return value > 0
-                },
-                message: props => `${props.value} is not a positive number. please try with positive number`
-            }, required: true, min: 0
+            type: Number,
+            required: true,
+            min: [0, "Copies must be a non-negative number"]
         },
         available: { type: Boolean, default: true }
     },
@@ -27,6 +27,6 @@ const bookSchema = new Schema<IBooks>(
         versionKey: false,
         timestamps: true
     }
-)
+);
 
-export const Book = model("Book", bookSchema)
+export const Book = model("Book", bookSchema);
